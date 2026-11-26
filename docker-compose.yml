@@ -1,0 +1,16 @@
+services:
+  ideathon:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8000
+      SUBMISSIONS_DIR: /data
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?Set a strong ADMIN_TOKEN in .env before starting}
+    volumes:
+      - ideathon-data:/data
+
+volumes:
+  ideathon-data:
