@@ -43,8 +43,8 @@ const setFile = (file) => {
     fileInput.value = '';
     return;
   }
-  if (file.size > 20 * 1024 * 1024) {
-    selectedFile.textContent = 'That file is over the 20 MB limit.';
+  if (file.size > 4 * 1024 * 1024) {
+    selectedFile.textContent = 'That file is over the 4 MB Netlify upload limit.';
     selectedFile.style.color = '#b34e39';
     fileInput.value = '';
     return;
@@ -85,7 +85,7 @@ document.querySelector('#submission-form')?.addEventListener('submit', async (ev
     const responseText = await response.text();
     let result;
     try { result = JSON.parse(responseText); } catch {
-      throw new Error('The upload server is not available. Start the site with “node server.mjs” and open it from that server.');
+      throw new Error('The submission function is not deployed. Confirm Netlify Functions directory is set to netlify/functions, then redeploy.');
     }
     if (!response.ok) throw new Error(result.error || 'Submission could not be saved.');
     note.textContent = `Submission received. Your reference number is ${result.id}.`;

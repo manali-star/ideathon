@@ -17,6 +17,12 @@ This project includes a production container and a persistent Docker volume for 
 
 The included `docker-compose.yml` is suitable for a Docker host with persistent volumes. The application has no managed database or cloud file storage configured, so use a host that preserves Docker volumes and handles HTTPS. Do not publish the organizer password in source control or send it to participants.
 
+## Deploy to Netlify
+
+`netlify.toml` publishes the site and configures `netlify/functions` for the API function. Connect the repository to Netlify, use the repository root as the base directory, leave the build command blank, and set publish directory to `.`. Add the site environment variable `ADMIN_TOKEN` with a new, long random password before deploying. Generate one locally with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"`; never reuse or publish the local organizer token. Netlify installs `@netlify/blobs` from `package.json`, and the function stores submissions, PPT files, announcements, settings and review state in Netlify Blobs.
+
+Netlify's buffered function request limit means the site limits uploaded PowerPoint files to 4 MB. Larger decks need direct-to-object-storage uploads or a different hosting design. After changing the function directory or adding `ADMIN_TOKEN`, trigger a fresh deploy. `/api/*` is served by `netlify/functions/api.mjs`; `/judges` maps to the organizer page. Existing local file submissions are not automatically migrated to Netlify Blobs.
+
 ## Where submissions are saved
 
 Each accepted entry is stored in `private-submissions/<submission-id>/`:
@@ -26,7 +32,7 @@ Each accepted entry is stored in `private-submissions/<submission-id>/`:
 
 This folder is excluded from Git and is not served by the website. Set `SUBMISSIONS_DIR` to choose a different persistent storage folder. Keep backups and restrict access to the machine or disk that holds these files.
 
-Open `http://localhost:8000/judges` to review entries and download each team’s original PPT. The organizer sign-in currently accepts the shared organizer password stored in `private-submissions/.organizer-token` (or `ADMIN_TOKEN` if configured). This is a server-generated shared password, not a personal username/password account system. Do not show it to participants. In the organizer workspace, open **Announcements** and choose **Delete announcement** on the item to remove it from both the workspace and public homepage. Participant passwords are not available because participant accounts have not been implemented; participants use the public idea submission form. The public submission form accepts PowerPoint files up to 20 MB, validates file extension and MIME type on the server, applies a basic per-address rate limit, and stores records and decks in private local folders.
+When run locally with `node server.mjs`, open `http://localhost:8000/judges` to review entries and download each team’s original PPT. The organizer sign-in accepts the shared organizer password stored in `private-submissions/.organizer-token` (or `ADMIN_TOKEN` if configured). This is not a personal account system. Do not show it to participants. In the organizer workspace, open **Announcements** and choose **Delete announcement** on the item to remove it from the workspace and public homepage. Participant passwords are not available because participant accounts have not been implemented; participants use the public idea submission form. The local Node server accepts PowerPoint files up to 20 MB; the Netlify function is capped at 4 MB per deck because of Netlify’s buffered request limit.
 
 ## Current scope
 

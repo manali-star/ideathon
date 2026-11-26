@@ -1,0 +1,16 @@
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/judges"
+  to = "/judges.html"
+  status = 200
+
+[[headers]]
+  for = "/private-submissions/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
